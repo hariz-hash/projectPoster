@@ -15,11 +15,21 @@ exports.setup = function(options, seedLink) {
 };
 
 exports.up = function(db) {
-  return null;
+  return db.createTable('posters', {
+    id: {type: 'int', primaryKey:true, autoIncrement: true, unsigned: true},
+    title: {type: 'string', length: 100, notNull: true},
+    cost: {type: 'int', notNull:true},
+    description: {type: 'text'},
+    date: {type: 'date', notNull:true},
+    stock: {type: 'int', notNull:true},
+    height: {type: 'int', notNull:true},
+    width: {type: 'int', notNull:true}
+
+  })
 };
 
 exports.down = function(db) {
-  return null;
+  return db.dropTable('posters');
 };
 
 exports._meta = {
