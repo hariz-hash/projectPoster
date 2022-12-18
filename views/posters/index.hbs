@@ -12,6 +12,7 @@
             <th>Stock</th>
             <th>Height</th>
             <th>Width</th>
+            <th></th>
 
 
         </tr>
@@ -44,6 +45,10 @@
                  <td>
                     {{this.width}}
                 </td>
+                 <td>
+                <a href="/posters/{{this.id}}/update" class="btn btn-primary btn-sm">Update</a>
+                <a href="/posters/{{this.id}}/delete" class="btn btn-danger btn-sm">Delete</a>
+            </td>
             </tr>
         {{/each}}
     </tbody>

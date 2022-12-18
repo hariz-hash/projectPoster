@@ -87,7 +87,7 @@ router.post('/:poster_id/update', async (req, res) => {
         'success': async (form) => {
             poster.set(form.data);
             poster.save();
-            res.redirect('/products');
+            res.redirect('/posters');
         },
         'error': async (form) => {
             res.render('posters/update', {
@@ -99,4 +99,26 @@ router.post('/:poster_id/update', async (req, res) => {
     })
 
 })
+
+router.get('/:poster_id/delete', async (req, res) => {
+    const poster = await Posters.where({
+        'id': req.params.poster_id
+    }).fetch({
+        require: true
+    });
+    res.render('posters/delete', {
+        'poster': poster.toJSON()
+    })
+});
+
+router.post('/:poster_id/delete', async (req, res) => {
+    const poster = await Posters.where({
+        'id': req.params.poster_id
+    }).fetch({
+        require: true
+    });
+    await poster.destroy();
+    res.redirect('/posters')
+})
+
 module.exports = router;
