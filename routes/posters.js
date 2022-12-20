@@ -72,8 +72,10 @@ router.get('/:poster_id/update', async (req, res) => {
         'id': posterId
     }).fetch({
         require: true,
-        withRelated:['tags']
+        withRelated:['tags'],
     });
+
+        const allTags = await Tag.fetchAll().map(each => [each.get('id'), each.get('name')]);
 
         // fetch all the categories
         const mediaProperties  = await MediaProperty.fetchAll().map((each) => {
@@ -81,7 +83,7 @@ router.get('/:poster_id/update', async (req, res) => {
              console.log(mediaProperties);
          })
 
-    const posterForm = createPostersForm(mediaProperties);
+    const posterForm = createPostersForm(mediaProperties,allTags);
 
     // fill in the existing values
     posterForm.fields.title.value = poster.get('title');
@@ -108,7 +110,6 @@ router.post('/:poster_id/update', async (req, res) => {
             // fetch all the categories
     const mediaProperties  = await MediaProperty.fetchAll().map((each) => {
             return [each.get('id'), each.get('name')];
-    // console.log(mediaProperties);
         })
     
 
@@ -116,15 +117,29 @@ router.post('/:poster_id/update', async (req, res) => {
     const poster = await Posters.where({
         'id': req.params.poster_id
     }).fetch({
-        require: true
+        require: true,
+        withRelated:['tags']
     });
 
     // process the form
     const postersForm = createPostersForm(mediaProperties);
     postersForm.handle(req, {
         'success': async (form) => {
-            poster.set(form.data);
+            let { tags, ...posterData } = form.data;
+
+            poster.set(posterData);
             poster.save();
+
+            let tagIds = tags.split(',');
+            let existingTagIds = await poster.related('tags').pluck('id');
+
+            // remove all the tags that aren't selected anymore
+            let toRemove = existingTagIds.filter( id => tagIds.includes(id) === false);
+            await poster.tags().detach(toRemove);
+
+            // add in all the tags selected in the form
+            await poster.tags().attach(tagIds);
+
             res.redirect('/posters');
         },
         'error': async (form) => {
