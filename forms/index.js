@@ -3,6 +3,7 @@ const forms = require("forms");
 // create some shortcuts
 const fields = forms.fields;
 const validators = forms.validators;
+const widgets = forms.widgets;
 
 var bootstrapField = function (name, object) {
     if (!Array.isArray(object.widget.classes)) { object.widget.classes = []; }
@@ -24,7 +25,9 @@ var bootstrapField = function (name, object) {
     return '<div class="form-group">' + label + widget + error + '</div>';
 };
 
-const createPostersForm = () => {
+const createPostersForm = (mediaProperties =[], tags=[]) => {
+    // console.log("in form/index"+ mediaProperties);
+
     return forms.create({
         'title' : fields.string({
             required: true,
@@ -47,6 +50,16 @@ const createPostersForm = () => {
             cssClasses: {
                 label: ['form-label']
             }
+        }),
+        'media_properties_id': fields.string({
+            label:'Media Property',
+            required: true,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            widget: widgets.select(),
+            choices: mediaProperties
         }),
         'date': fields.date({
             required: true,
@@ -79,6 +92,15 @@ const createPostersForm = () => {
             },
             'validators':[validators.integer()]
         }),
+        'tags': fields.string({
+            required: true,
+            errorAfterField: true,
+            cssClasses: {
+                label: ['form-label']
+            },
+            widget: widgets.multipleSelect(),
+            choices:tags
+        })
     })
 };
 
